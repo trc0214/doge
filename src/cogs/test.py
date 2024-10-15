@@ -1,9 +1,13 @@
-#cogs/test.py
+import discord
+from discord import app_commands
 from discord.ext import commands
 
-class test(commands.Cog):
-    def __init__(self, bot):
+class TestGroup(commands.GroupCog, name="test", description="Test commands"):
+    group = app_commands.Group(name="functions", description="Test functions")
+    
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
+        super().__init__()
 
     # Event listener for when the bot is ready
     @commands.Cog.listener()
@@ -20,9 +24,9 @@ class test(commands.Cog):
             await message.channel.send('PONG!')
 
     # Slash command: /hello
-    @commands.command(name="hello", description="Say hello to the bot")
-    async def hello(self, ctx: commands.Context):
-        await ctx.send("Hello!")
-
-async def setup(bot):
-    await bot.add_cog(test(bot))
+    @app_commands.command(name="hello", description="Say hello to the bot")
+    async def hello(self, interaction: discord.Interaction):
+        await interaction.response.send_message("Hello!")
+        
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(TestGroup(bot))
