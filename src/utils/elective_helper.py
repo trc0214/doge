@@ -56,8 +56,6 @@ async def create_new_category(interaction: discord.Interaction, category_name: s
     new_category = await guild.create_category(category_name)
     await configure_category_permissions(new_category, guild.default_role, new_role)
     await create_default_channels(guild, new_category)
-    
-    await interaction.response.send_message(f"Category {category_name} created with role {new_role.name}!")
 
 # Message Editing
 async def edit_message(interaction: discord.Interaction, message_id: int, new_content: str):

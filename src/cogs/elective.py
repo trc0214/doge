@@ -34,11 +34,14 @@ class ElectiveGroup(commands.GroupCog, name="elective", description="Elective co
         await toggle_role(interaction, new_role)
         
         # Update the message with new role options
+        print("start update")
         channel_id, message_id = self.retrieve_message_data()
-        channel = await interaction.fetch_channel(channel_id)
+        print(channel_id, message_id)
+        channel = await interaction.client.fetch_channel(channel_id)
         message = await channel.fetch_message(message_id)
+        print("fetch success")
         await message.edit(content="Select a role:", view=await roles_btn_view(interaction))
-
+        
     def store_message_data(self, channel_id, message_id):
         # Save message and channel data to XML
         root = ET.Element("root")
@@ -52,7 +55,7 @@ class ElectiveGroup(commands.GroupCog, name="elective", description="Elective co
 
     def retrieve_message_data(self):
         # Read message and channel IDs from XML
-        tree = ET.parse("data/elective.xml")
+        tree = ET.parse("src/data/elective.xml")
         root = tree.getroot()
         channel_id = int(root.find("channel_id").text)
         message_id = int(root.find("message_id").text)
