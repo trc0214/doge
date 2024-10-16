@@ -26,17 +26,18 @@ class ElectiveGroup(commands.GroupCog, name="elective", description="Elective co
         self.store_message_data(interaction.channel.id, message.id)
 
     @app_commands.command(name="create", description="create elective category")
-    async def elective(self, ctx: commands.Context, name: str):
+    async def elective(self, interaction: discord.Interaction, name: str):
         # Create new role and category
-        new_role = await create_new_role(ctx, name)
-        await create_new_category(ctx, name, new_role=new_role)
-        await toggle_role(ctx, new_role)
-
+        name = name + " (take)"
+        new_role = await create_new_role(interaction, name)
+        await create_new_category(interaction, name, new_role)
+        await toggle_role(interaction, new_role)
+        
         # Update the message with new role options
         channel_id, message_id = self.retrieve_message_data()
-        channel = await ctx.fetch_channel(channel_id)
+        channel = await interaction.fetch_channel(channel_id)
         message = await channel.fetch_message(message_id)
-        await message.edit(content="Select a role:", view=await roles_btn_view(ctx))
+        await message.edit(content="Select a role:", view=await roles_btn_view(interaction))
 
     def store_message_data(self, channel_id, message_id):
         # Save message and channel data to XML
@@ -47,7 +48,7 @@ class ElectiveGroup(commands.GroupCog, name="elective", description="Elective co
         message_elem.text = str(message_id)
         
         tree = ET.ElementTree(root)
-        tree.write("data/elective.xml")
+        tree.write("src/data/elective.xml")
 
     def retrieve_message_data(self):
         # Read message and channel IDs from XML

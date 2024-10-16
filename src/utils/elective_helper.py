@@ -18,16 +18,14 @@ async def create_default_channels(guild, category):
         await guild.create_voice_channel(channel, category=category)
 
 # Role Management
-async def toggle_role(interaction: discord.Interaction, role, remove=False):
+async def toggle_role(interaction: discord.Interaction, role):
     if not role:
-        await interaction.response.send_message("Role not found!", ephemeral=True)
         return
-    if remove:
-        await interaction.user.remove_roles(role)
-        await interaction.response.send_message(f"Removed {role.name} from {interaction.user.name}", ephemeral=True)
-    else:
-        await interaction.user.add_roles(role)
-        await interaction.response.send_message(f"Added {role.name} to {interaction.user.name}", ephemeral=True)
+    user = interaction.user
+    if role in user.roles:
+        await user.remove_roles(role)
+    if role not in user.roles:
+        await user.add_roles(role)
 
 async def create_new_role(interaction: discord.Interaction, role_name: str):
     guild = interaction.guild
@@ -41,7 +39,6 @@ async def create_new_role(interaction: discord.Interaction, role_name: str):
         return
 
     new_role = await guild.create_role(name=role_name)
-    await interaction.response.send_message(f"Role {new_role.name} has been created!")
     return new_role
 
 # Category Management
@@ -77,10 +74,8 @@ class RolesBtn(discord.ui.Button):
         self.role = role
 
     async def callback(self, interaction: discord.Interaction):
-        if self.role in interaction.user.roles:
-            await toggle_role(interaction, self.role, remove=True)
-        else:
-            await toggle_role(interaction, self.role)
+        await toggle_role(interaction, self.role)
+        
 
 # UI Handling - Button View
 class RolesBtnView(discord.ui.View):
